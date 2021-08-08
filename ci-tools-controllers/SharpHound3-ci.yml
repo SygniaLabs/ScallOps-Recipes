@@ -1,0 +1,11 @@
+variables:
+  EXE_RELEASE_FOLDER: 'SharpHound3/bin/Release'
+  EXE_FILE_NAME: 'SharpHound3.exe'
+  CI_PROJECT_SLN_PATH: 'SharpHound3.sln'
+
+include:
+  - project: 'root/scallops-recipes'
+    file: 'ci-builders/sharptools-ci.yml'
+
+stages:
+  - build

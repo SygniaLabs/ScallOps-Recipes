@@ -1,0 +1,11 @@
+variables:
+  EXE_RELEASE_FOLDER: 'bin/Release'
+  EXE_FILE_NAME: 'PingCastle.exe'
+  CI_PROJECT_SLN_PATH: 'PingCastle.sln'
+
+include:
+  - project: 'root/scallops-recipes'
+    file: 'ci-builders/sharptools-ci.yml'
+
+stages:
+  - build

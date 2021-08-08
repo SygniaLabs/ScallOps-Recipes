@@ -1,0 +1,11 @@
+variables:
+  EXE_RELEASE_FOLDER: 'SharpPrintNightmare/SharpPrintNightmare/bin/Release'
+  EXE_FILE_NAME: 'SharpPrintNightmare.exe'
+  CI_PROJECT_SLN_PATH: 'SharpPrintNightmare/SharpPrintNightmare/SharpPrintNightmare.sln'
+
+include:
+  - project: 'root/scallops-recipes'
+    file: 'ci-builders/sharptools-ci.yml'
+
+stages:
+  - build

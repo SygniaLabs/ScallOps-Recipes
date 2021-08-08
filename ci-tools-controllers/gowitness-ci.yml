@@ -1,0 +1,12 @@
+variables:
+  EXE_FILE_NAME: 'gowitness.exe'
+  GO_GET_PATH: 'github.com/sensepost/gowitness'
+
+include:
+  
+  - project: 'root/scallops-recipes'
+    file: 'ci-builders/go-builder-win-ci.yml'
+
+stages:
+  - build
+

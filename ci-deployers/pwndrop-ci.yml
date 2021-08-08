@@ -1,0 +1,22 @@
+# Works with this PwnDrop PullRequest - https://github.com/kgretzky/pwndrop/pull/28 <- https://github.com/B1t0n/pwndrop
+deploy_pwndrop:
+  stage: deploy
+  image: ubuntu:bionic
+  tags: 
+   - kubernetes
+   - linux
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+    PWNDROP_URL: $PWNDROP_URL
+    PWNDROP_WRITE_KEY: $PWNDROP_WRITE_KEY
+  script:
+   - 'apt-get update && apt-get install -y curl'
+   - 'echo $DEPLOY_FILE_PATH'
+   - ls -la
+   - 'curl --insecure -X POST -H "Authorization: $PWNDROP_WRITE_KEY" -F "file=@"$DEPLOY_FILE_PATH $PWNDROP_URL/api/v1/files >> pwndrop_res.json'
+   - 'cat pwndrop_res.json'
+  artifacts:
+    paths: 
+      - pwndrop_res.json
+    expire_in: 1 week
+

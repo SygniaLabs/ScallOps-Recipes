@@ -1,0 +1,17 @@
+variables:
+  EXE_RELEASE_FOLDER: 'Rubeus/bin/Release'
+  EXE_FILE_NAME: 'Rubeus.exe'
+  CI_PROJECT_SLN_PATH: 'Rubeus.sln'
+
+include:
+  - project: 'root/scallops-recipes'
+    file: 'ci-builders/sharptools-ci.yml'
+  - project: 'root/scallops-recipes'
+    file: ci-obfuscations/confuserEX-windows.yml
+  - project: 'root/scallops-recipes'
+    file: ci-deployers/pwndrop-ci.yml
+
+stages:
+  - build
+  - obfuscate
+  - deploy

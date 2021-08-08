@@ -1,0 +1,42 @@
+trigger_PowerUpSQL:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER == "mssql"
+     - $CI_MULTI_TRIGGER == "ad"
+     - $CI_MULTI_TRIGGER == "windows"
+     - $CI_MULTI_TRIGGER == "all"
+  trigger: 
+    project: root/PowerUpSQL
+  variables:
+    PWNDROP_WRITE_KEY: $PWNDROP_WRITE_KEY
+    PWNDROP_URL: $PWNDROP_URL
+
+
+trigger_Rubeus:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER == "kerberos"
+     - $CI_MULTI_TRIGGER == "ad"
+     - $CI_MULTI_TRIGGER == "windows"
+     - $CI_MULTI_TRIGGER == "all"
+  trigger: 
+    project: root/Rubeus
+  variables:
+    PWNDROP_WRITE_KEY: $PWNDROP_WRITE_KEY
+    PWNDROP_URL: $PWNDROP_URL
+
+trigger_goddi:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER == "ad-recon"
+     - $CI_MULTI_TRIGGER == "ad"
+     - $CI_MULTI_TRIGGER == "windows"
+     - $CI_MULTI_TRIGGER == "all"
+  trigger: 
+    project: root/goddi
+  variables:
+    PWNDROP_WRITE_KEY: $PWNDROP_WRITE_KEY
+    PWNDROP_URL: $PWNDROP_URL

@@ -1,0 +1,21 @@
+variables:
+  PS_OBFUSCATED_FILE_NAME: $PS_FILE_NAME-chimered.ps1
+  DEPLOY_FILE_PATH: $PS_FILE_NAME-chimered.ps1
+ps_chimera_obfuscation:
+  stage: obfuscate
+  image: ubuntu:18.04 # TBD modify to customized container
+  tags: 
+   - kubernetes
+   - linux
+  script:
+   - echo $PS_FILE_NAME
+   - ls -la
+   - printenv
+   - apt-get update && apt-get install -Vy sed xxd libc-bin curl jq perl gawk grep coreutils git
+   - git clone https://github.com/tokyoneon/chimera
+   - chmod +x chimera/chimera.sh; chimera/chimera.sh --help
+   - 'chimera/chimera.sh -f $PS_FILE_NAME -k -s -j -b -l 0 -r -o $PS_OBFUSCATED_FILE_NAME'
+  artifacts:
+    paths: 
+      - $PS_OBFUSCATED_FILE_NAME
+    expire_in: 1 week

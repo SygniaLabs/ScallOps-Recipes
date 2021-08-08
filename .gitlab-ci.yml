@@ -1,0 +1,41 @@
+variables:
+  DEPLOYMENT_INIT:
+    value: ""  
+    description: "Initialize deployment with containers at GCR and import tools to instance. Enable if this is your first time ruuning this pipeline after Terraform deployment."
+  CI_MULTI_TRIGGER:
+    value: ""
+    description: "Execute multiple pipelines. Enter group trigger term."
+  PWNDROP_URL:
+    value: ""
+    description: "If wishing to deploy artifacts to PwnDrop, you must supply it's URL"
+  PWNDROP_WRITE_KEY:
+    value: ""
+    description: "If wishing to deploy artifacts to PwnDrop, you must supply write key (click 'Upload via cURL command')."
+  DOCKERFILE_BUILD_LINUX:
+    value: ""
+    description: "Build and push a dockerfile by specifying it's name prefix. File must be located under dockerfiles/linux."
+
+
+include:
+  # Healthchecks
+  - project: 'root/scallops-recipes'
+    file: '_ci-maintain/os-triggers.yml'
+  - project: 'root/scallops-recipes'
+    file: '_ci-maintain/variable-check.yml'
+  # Instance and deployment maintain
+  - project: 'root/scallops-recipes'
+    file: '_ci-maintain/ci-container-builders/kaniko-linux.yml'
+  - project: 'root/scallops-recipes'
+    file: '_ci-maintain/tools-import.yml'
+  # Multi pipeline triggers YAMLs
+  - project: 'root/scallops-recipes'
+    file: 'ci-multi-pipeline/ad.yml'
+
+
+stages:
+  - healthcheck
+  - featureCheck
+  - buildContainers
+  - toolsImporter
+  #- Multi Pipeline trigger stages below:
+  - multiTrigger

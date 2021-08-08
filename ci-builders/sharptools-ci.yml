@@ -1,0 +1,17 @@
+build_job:
+  stage: build
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+    MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\msbuild.exe'
+    GCP_PROJECT_ID: $GCP_PROJECT_ID
+  image: gcr.io/$GCP_PROJECT_ID/ltsc19-sdk35-azbuild:latest
+  tags: 
+   - kubernetes
+   - windows
+  script:
+    - 'nuget restore $env:CI_PROJECT_SLN_PATH'
+    - '& "$env:MSBUILD_PATH" $env:CI_PROJECT_SLN_PATH /p:Configuration=Release'
+    - 'curl.exe -L https://storage.googleapis.com/$CI_CD_UTILS_BUKCET/bins/gitlab-runner-helper.exe --output "gitlab-runner-helper.exe"'
+    - '.\gitlab-runner-helper.exe --version'
+    - '.\gitlab-runner-helper.exe artifacts-uploader --id $env:CI_JOB_ID --token $env:CI_JOB_TOKEN --url $env:CI_SERVER_URL --path $env:EXE_RELEASE_FOLDER\$env:EXE_FILE_NAME --expire-in "1 week" --verbose'
+

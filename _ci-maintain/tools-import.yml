@@ -1,0 +1,26 @@
+import_public_tools:
+  stage: toolsImporter
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+  tags: 
+   - kubernetes
+   - linux
+  image:
+    name: ubuntu:latest
+    entrypoint: [""]
+  rules:
+   - if: '$DEPLOYMENT_INIT'
+     when: always
+   - if: '$CI_PIPELINE_SOURCE == "web"'
+     when: never
+   - changes:
+       - ci-tools-controllers/.tools-index.json
+  script:
+    - 'cd ci-tools-controllers'
+    - 'apt-get update && apt-get install -y jq curl grep'
+    - cat .tools-index.json | jq '.public[].name' > public-tools-names.txt
+    - 'curl --insecure --header "PRIVATE-TOKEN: $GITLAB_API_ACCESS" $CI_SERVER_URL/api/v4/projects > existing-projects.json'
+    - "cat existing-projects.json  | jq '.[].name' > existing-projects-names.txt"
+    - "grep -vxFfexisting-projects-names.txt public-tools-names.txt > tools-to-import.txt"
+    - "cat tools-to-import.txt"
+    - "for p in $(cat tools-to-import.txt); do cat .tools-index.json | jq '.public[] | select(.name=='$p')' | curl -k -d @- -H 'Content-Type: application/json' -H  'PRIVATE-TOKEN: '$GITLAB_API_ACCESS $CI_SERVER_URL/api/v4/projects ; done"

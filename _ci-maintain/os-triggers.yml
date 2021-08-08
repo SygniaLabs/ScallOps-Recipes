@@ -1,0 +1,42 @@
+trigger_linux:
+  stage: healthcheck
+  rules:
+   - if: '$DEPLOYMENT_INIT'
+     when: always
+   - if: '$CI_MULTI_TRIGGER'
+     when: never
+   - if: '$DOCKERFILE_BUILD_LINUX'
+     when: never
+   - changes:
+       - _ci-maintain/os-triggers.yml
+  tags: 
+   - kubernetes
+   - linux
+  image: ubuntu:bionic
+  script:
+      - 'env'
+      - id
+
+
+trigger_win:
+  stage: healthcheck
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+  rules:
+   - if: '$DEPLOYMENT_INIT'
+     when: always
+   - if: '$CI_MULTI_TRIGGER'
+     when: never
+   - if: '$DOCKERFILE_BUILD_LINUX'
+     when: never
+   - changes:
+       - _ci-maintain/os-triggers.yml
+  tags: 
+   - kubernetes
+   - windows
+  image: 
+    name: b1t0n/gitlab-runner-helper:x86_64-latest-servercore1809-pwsh
+    entrypoint: [""]
+  script:
+      - 'ipconfig'
+      - 'type C:\Windows\System32\drivers\etc\hosts'

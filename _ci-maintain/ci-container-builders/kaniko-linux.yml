@@ -1,0 +1,49 @@
+build_LinuxContainer:
+  stage: buildContainers
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: "/secret/kaniko-token-secret.json"
+  tags: 
+   - kubernetes
+   - linux
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  rules:
+   - if: '$DOCKERFILE_BUILD_LINUX'
+     when: always
+   - if: '$CI_PIPELINE_SOURCE == "web"'
+     when: never
+   - if: '$CI_PIPELINE_SOURCE == "push"'
+     when: never
+   - if: '$CI_PIPELINE_SOURCE == "api"'
+     when: never
+  script:
+    - echo $GCP_PROJECT_ID
+    - cd $CI_PROJECT_DIR/_ci-maintain/dockerfiles/linux
+    - /kaniko/executor --context ./ --dockerfile $DOCKERFILE_BUILD_LINUX.dockerfile --destination gcr.io/$GCP_PROJECT_ID/$DOCKERFILE_BUILD_LINUX:latest
+
+
+
+build_all_LinuxContainers:
+  stage: buildContainers
+  variables:
+    GOOGLE_APPLICATION_CREDENTIALS: "/secret/kaniko-token-secret.json"
+  tags: 
+   - kubernetes
+   - linux
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  rules:
+   - if: '$DEPLOYMENT_INIT'
+     when: always
+   - if: '$CI_PIPELINE_SOURCE == "web"'
+     when: never
+   - if: '$CI_PIPELINE_SOURCE == "push"'
+     when: never
+   - if: '$CI_PIPELINE_SOURCE == "api"'
+     when: never
+  script:
+    - echo $GCP_PROJECT_ID
+    - cd $CI_PROJECT_DIR/_ci-maintain/dockerfiles/linux
+    - for dockerfile in $(ls *.dockerfile); do FILE=${dockerfile/.*/} && echo $FILE && /kaniko/executor --context ./ --dockerfile $FILE.dockerfile --destination gcr.io/$GCP_PROJECT_ID/$FILE:latest; done

@@ -1,0 +1,13 @@
+variables:
+  PS_FILE_NAME: 'PowerUpSQL.ps1'
+
+include:
+  - project: 'root/scallops-recipes'
+    file:  ci-obfuscations/chimera-ps-obfuscation-ci.yml
+  - project: 'root/scallops-recipes'
+    file: ci-deployers/pwndrop-ci.yml
+
+
+stages:
+  - obfuscate
+  - deploy
