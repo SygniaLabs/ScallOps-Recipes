@@ -1,35 +1,84 @@
 variables:
-  DEPLOYMENT_INIT:
-    value: ""  
-    description: "Initialize deployment with containers at GCR and import tools to instance. Enable if this is your first time ruuning this pipeline after Terraform deployment."
   CI_MULTI_TRIGGER:
     value: ""
-    description: "Execute multiple pipelines. Enter group trigger term."
-  PWNDROP_URL:
+    description: "Specify single tool, multiple tools or suit of tools as the pipeline input. Example: 'Rubeus,powershell'. (Supports Community Tools only)."
+  REMOTE_FILE_URL:
     value: ""
-    description: "If wishing to deploy artifacts to PwnDrop, you must supply it's URL"
-  PWNDROP_WRITE_KEY:
+    description: "Specify URL for remote payload to download."
+  REMOTE_FILE_TYPE:
     value: ""
-    description: "If wishing to deploy artifacts to PwnDrop, you must supply write key (click 'Upload via cURL command')."
-  DOCKERFILE_BUILD_LINUX:
+    description: "Specify the file type that will be downloaded (e.g dotNET / shellcode / PE / PS)."
+  PWNDROP_CURL_CMD:
     value: ""
-    description: "Build and push a dockerfile by specifying it's name prefix. File must be located under dockerfiles/linux."
+    description: "cURL command for uploading artifacts (click 'Upload via cURL command' and paste here). *Make sure you are using HTTPS."
+  CI_PREOBFUSCATIONS:
+    value: "Namings-GUID-PDB,psCommnets,psVariables,psBackticks"
+    description: "Obfuscation techniques to implement on the source code."
+  OBFUSCATED_PROJECT_NAME:
+    value: "WindowsUpdate"
+    description: "Obfuscated project name for Namings-GUID-PDB technique."    
+  CI_OBFUSCATIONS:
+    value: "constants,ctrlflow,refproxy,rename,resources,typescramble"
+    description: "Post compilation obfuscation techniques to use (supports .NET/C# only)."
+  CI_CONVERTERS:
+    value: "PEtoSHELLCODE"
+    description: "File type conversion methods."
+  SHELLCODE_ARGS:
+    value: ""
+    description: "Command line arguments used for shellcode conversion."
+  CI_ENCRYPTERS:
+    value: "b64Xor,DInjectorEncrypt,PSEncrypt,CStoPSEncrypt"
+    description: "Binary encoders / encrypters / packers to use."
+  CI_EVASIONS:
+    value: "amsiBypass,psReadline" #"amsiBypass,etwBypass,psLogging,psReadline,codeSign,antiDebug,unhook,rxMemAlloc,unpackDelay"
+    description: "Apply OS and process evasion techniques on the payload."
+  CI_LOADERS:
+    value: "b64XorRefelection,shellcode-dll,amsibypassChunker"
+    description: "Specify loader techniques to wrap the payload with. Some modules depend on equivalent modules from previous stages."
+  CI_TESTS:
+    value: "exe_exec,ps_invoke,defendercheck"
+    description: "Perform payload loading and execution tests and/or AV analysis Tests."
+  CI_EXECUTORS:
+    value: "shellcode-injection,dotNETInvoke"
+    description: "Generate executor to your task with specific methods."
+  SHELLCODE_INJECTION_TECHNIQUE:
+    value: "currentthread"
+    description: "Injection technique to use with 'shellcode-injection' (Only one choice supported)."
+  DOTNET_INVOKER_CMD:
+    value: "-h"
+    description: "Specify command line arguments for the dotNETInvoke executor."
+  CI_DEPLOYERS:
+    value: "Pwndrop"
+    description: "Specify file servers to deploy the payloads to."
+  CI_FORCE_REBUILD:
+    value: ""
+    description: "Gitlab will automatically download the latest successful build artifacts. If you still required to compile again, enter 'true' value."
+
+#  DOCKERFILE_BUILD_LINUX:
+#    value: ""
+#    description: "Build and push a dockerfile by specifying it's name prefix. File must be located under dockerfiles/linux."
+#  HEALTH_CHECK:
+#    value: ""  
+#    description: "Perform health checks to the framework. OS triggers, Gitlab DNS records from Pods, Variables checks, etc."
+# IMPORT_TOOLS:
+#   value: ""  
+#   description: "Trigger tool import jobs to verify all tools from tools-index.json are imported to the relevant groups."  
+# DEPLOYMENT_INIT:
+#   value: ""  
+#   description: "Initialize deployment with containers at GCR and import tools to instance. Enable if this is your first time ruuning this pipeline after Terraform deployment."
 
 
 include:
-  # Healthchecks
-  - project: 'root/scallops-recipes'
-    file: '_ci-maintain/os-triggers.yml'
-  - project: 'root/scallops-recipes'
-    file: '_ci-maintain/variable-check.yml'
-  # Instance and deployment maintain
-  - project: 'root/scallops-recipes'
-    file: '_ci-maintain/ci-container-builders/kaniko-linux.yml'
-  - project: 'root/scallops-recipes'
-    file: '_ci-maintain/tools-import.yml'
+  #Healthchecks
+  - '_ci-maintain/os-triggers.yml'
+  - '_ci-maintain/api-tests.yml'
+  - '_ci-maintain/private-container-registries.yml'
+  #Instance and deployment maintain
+  - '_ci-maintain/ci-container-builders/kaniko-linux.yml'
+  - '_ci-maintain/tools-import.yml'
   # Multi pipeline triggers YAMLs
-  - project: 'root/scallops-recipes'
-    file: 'ci-multi-pipeline/ad.yml'
+  - 'ci-multi-pipeline/multipipe-pick.yml'
+
 
 
 stages:
@@ -37,5 +86,6 @@ stages:
   - featureCheck
   - buildContainers
   - toolsImporter
-  #- Multi Pipeline trigger stages below:
+  - updateToolsRef
   - multiTrigger
+
