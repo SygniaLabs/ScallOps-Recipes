@@ -1,0 +1,22 @@
+repo_url:
+  stage: pull
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+    GIT_STRATEGY: none
+  tags: 
+   - kubernetes
+   - linux
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  only:
+    variables:
+      - $REMOTE_REPO_URL
+  script:
+    - echo "Pulling repo - $REMOTE_REPO_URL"
+    - git clone $REMOTE_REPO_URL .
+    - echo "GIT_STRATEGY=none" >> repo_url.env
+  artifacts:
+    paths: 
+      - ./*
+    expire_in: 1 week
+    reports:
+        dotenv: repo_url.env

@@ -1,0 +1,25 @@
+dinjector_shellcode_encrypt:
+  stage: encrypt
+  only:
+    variables:
+     - $CI_ENCRYPTERS =~ /^.*(DInjectorEncrypt).*$/
+  allow_failure: true  
+  image: gcr.io/$GCP_PROJECT_ID/dinjector:latest
+  variables:
+    SHELLCODE_ENCRYPTED_FILE_NAME: $SHELLCODE_FILE_PATH-enc.bin
+    GIT_STRATEGY: none
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - mkdir -p deploy_dir
+    - SHELLCODE_ENCRYPTION_KEY=$(xxd -l 8 -c 32 -p < /dev/random)
+    - echo $SHELLCODE_ENCRYPTION_KEY
+    - echo $SHELLCODE_ENCRYPTION_KEY >> deploy_dir/$SHELLCODE_FILE_PATH-enc.key
+    - python3 /opt/dinjector/encrypt.py $SHELLCODE_FILE_PATH -p "$SHELLCODE_ENCRYPTION_KEY" -o $SHELLCODE_ENCRYPTED_FILE_NAME
+    - cp $SHELLCODE_ENCRYPTED_FILE_NAME deploy_dir/$SHELLCODE_ENCRYPTED_FILE_NAME
+  artifacts:
+    paths: 
+      - $SHELLCODE_ENCRYPTED_FILE_NAME
+      - deploy_dir
+    expire_in: 1 week

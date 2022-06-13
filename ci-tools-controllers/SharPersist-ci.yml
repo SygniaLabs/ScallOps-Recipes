@@ -1,0 +1,10 @@
+variables:
+  EXE_RELEASE_FOLDER: 'SharPersist/bin/Release'
+  EXE_FILE_NAME: 'SharPersist.exe'
+  CI_PROJECT_SLN_PATH: 'SharPersist.sln'
+  ADD_NUGET_PACKAGES: "TaskScheduler:2.8.11,Costura.Fody:3.3.3"
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

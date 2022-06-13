@@ -1,22 +1,30 @@
 # Works with this PwnDrop PullRequest - https://github.com/kgretzky/pwndrop/pull/28 <- https://github.com/B1t0n/pwndrop
 deploy_pwndrop:
   stage: deploy
-  image: ubuntu:bionic
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  only:
+    variables:
+      - $PWNDROP_CURL_CMD =~ /^curl.*"Authorization:\ \w{32}.*https:\/\/.*\/api\/v1\/files$/
+      - $CI_DEPLOYERS =~ /^.*(Pwndrop).*$/
   tags: 
    - kubernetes
    - linux
   variables:
     GIT_SSL_NO_VERIFY: "true"
-    PWNDROP_URL: $PWNDROP_URL
-    PWNDROP_WRITE_KEY: $PWNDROP_WRITE_KEY
   script:
-   - 'apt-get update && apt-get install -y curl'
-   - 'echo $DEPLOY_FILE_PATH'
    - ls -la
-   - 'curl --insecure -X POST -H "Authorization: $PWNDROP_WRITE_KEY" -F "file=@"$DEPLOY_FILE_PATH $PWNDROP_URL/api/v1/files >> pwndrop_res.json'
+   - PWNDROP_URL=$(echo $PWNDROP_CURL_CMD | sed -n -e 's/.*https:\/\/\(.*\)\/api\/v1\/files/https:\/\/\1/p')
+   - PWNDROP_WRITE_KEY=$(echo $PWNDROP_CURL_CMD | sed -n -e 's/.*Authorization:\ \(\w\+\).*/\1/p' )
+   # Remove slash from the end of the url.
+   - PWNDROP_URL=$(echo $PWNDROP_URL | sed 's/\/$//')
+   - echo $PWNDROP_URL
+   - echo "[" >>  pwndrop_res.json-builder
+   - 'for FILE in $(ls deploy_dir); do echo $FILE; curl --insecure -X POST -H "Authorization: $PWNDROP_WRITE_KEY" -F "file=@deploy_dir/"$FILE $PWNDROP_URL/api/v1/files >> pwndrop_res.json-builder; echo "," >>  pwndrop_res.json-builder; done'
+   - sed '$ s/.$//' pwndrop_res.json-builder > pwndrop_res.json
+   - echo "]" >>  pwndrop_res.json
    - 'cat pwndrop_res.json'
+   - cat pwndrop_res.json | jq --arg pdropurl $PWNDROP_URL '.[].data | .name + " = " + $pdropurl + .url_path'
   artifacts:
     paths: 
       - pwndrop_res.json
     expire_in: 1 week
-

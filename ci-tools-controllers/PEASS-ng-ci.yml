@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'winPEAS/winPEASexe/winPEAS/bin/Release'
+  EXE_FILE_NAME: 'winPEAS.exe'
+  CI_PROJECT_SLN_PATH: 'winPEAS/winPEASexe/winPEAS.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml' 

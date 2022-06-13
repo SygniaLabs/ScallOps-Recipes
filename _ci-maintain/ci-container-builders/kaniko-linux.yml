@@ -4,22 +4,17 @@ build_LinuxContainer:
     GOOGLE_APPLICATION_CREDENTIALS: "/secret/kaniko-token-secret.json"
   tags: 
    - kubernetes
-   - linux
+   - kaniko
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  rules:
-   - if: '$DOCKERFILE_BUILD_LINUX'
-     when: always
-   - if: '$CI_PIPELINE_SOURCE == "web"'
-     when: never
-   - if: '$CI_PIPELINE_SOURCE == "push"'
-     when: never
-   - if: '$CI_PIPELINE_SOURCE == "api"'
-     when: never
+  only:
+    variables:
+      - $DOCKERFILE_BUILD_LINUX
   script:
     - echo $GCP_PROJECT_ID
-    - cd $CI_PROJECT_DIR/_ci-maintain/dockerfiles/linux
+    - cd _ci-maintain/dockerfiles/linux
+    - pwd
     - /kaniko/executor --context ./ --dockerfile $DOCKERFILE_BUILD_LINUX.dockerfile --destination gcr.io/$GCP_PROJECT_ID/$DOCKERFILE_BUILD_LINUX:latest
 
 
@@ -30,19 +25,13 @@ build_all_LinuxContainers:
     GOOGLE_APPLICATION_CREDENTIALS: "/secret/kaniko-token-secret.json"
   tags: 
    - kubernetes
-   - linux
+   - kaniko
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
-  rules:
-   - if: '$DEPLOYMENT_INIT'
-     when: always
-   - if: '$CI_PIPELINE_SOURCE == "web"'
-     when: never
-   - if: '$CI_PIPELINE_SOURCE == "push"'
-     when: never
-   - if: '$CI_PIPELINE_SOURCE == "api"'
-     when: never
+  only:
+    variables:
+      - $DEPLOYMENT_INIT
   script:
     - echo $GCP_PROJECT_ID
     - cd $CI_PROJECT_DIR/_ci-maintain/dockerfiles/linux

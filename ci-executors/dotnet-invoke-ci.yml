@@ -1,0 +1,25 @@
+variables:
+  DOTNET_INVOKER_EXEC_PATH: $DOTNETXOR_REFLECTION_LOADER_PATH-EXEC.ps1
+gen_dotnet_invoker:
+  only:
+    variables:
+     - '$CI_LOADERS =~ /^.*(b64XorRefelection).*$/ && $CI_EXECUTORS =~ /^.*(dotNETInvoke).*$/'
+  stage: exec
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - mkdir -p deploy_dir
+    - if [ -z "$DOTNET_NAMESPACE" ]; then DOTNET_NAMESPACE=$(echo $EXE_FILE_NAME | cut -d "." -f1) ; fi
+    - if [ -z "$DOTNET_CLASS" ]; then DOTNET_CLASS="Program" ; fi
+    - if [ -z "$DOTNET_ENTRY_METHOD" ]; then DOTNET_ENTRY_METHOD="Main" ; fi        
+    - echo '$asm.GetType("'$DOTNET_NAMESPACE'.'$DOTNET_CLASS'", [Reflection.BindingFlags] "NonPublic,Static").GetMethod("'$DOTNET_ENTRY_METHOD'", ([Reflection.BindingFlags] "NonPublic,Static")).Invoke($null, (, "'$DOTNET_INVOKER_CMD'".split()))' >> $DOTNET_INVOKER_EXEC_PATH
+    - cp $DOTNET_INVOKER_EXEC_PATH deploy_dir/
+  artifacts:
+    paths: 
+      - $DOTNET_INVOKER_EXEC_PATH
+      - deploy_dir
+    expire_in: 1 week
+    
+

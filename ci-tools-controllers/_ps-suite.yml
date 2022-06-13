@@ -1,0 +1,4 @@
+include:
+  - 'ci-preobfuscate/chimera-ps-obfuscation-ci.yml'
+  - 'ci-deployers/ps-mark-for-deploy-ci.yml'
+  - 'ci-encrypters/ps-armoury-ci.yml'

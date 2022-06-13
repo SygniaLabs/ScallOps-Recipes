@@ -1,0 +1,26 @@
+download_payload:
+    variables:
+      GIT_STRATEGY: none
+    stage: build
+    tags: 
+        - kubernetes
+        - linux
+    image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+    script:
+        - echo downloading $REMOTE_FILE_URL
+        - 'curl -k -v -L -O -J $REMOTE_FILE_URL'
+        - REMOTE_FILE_NAME=$(basename $REMOTE_FILE_URL)
+        - echo $REMOTE_FILE_NAME
+        - echo "REMOTE_FILE_NAME=$REMOTE_FILE_NAME" >> download_payload.env
+        - if [ $REMOTE_FILE_TYPE == "dotNET" ]; then echo "EXE_FILE_NAME=$REMOTE_FILE_NAME" >> download_payload.env; fi        #Support .NET pipelines
+        - if [ $REMOTE_FILE_TYPE == "shellcode" ]; then echo "SHELLCODE_FILE_PATH=$REMOTE_FILE_NAME" >> download_payload.env; fi  #Support Shellcode specific pipelines
+        - if [ $REMOTE_FILE_TYPE == "PE" ]; then echo "EXE_FILE_NAME=$REMOTE_FILE_NAME" >> download_payload.env; fi
+        - if [ $REMOTE_FILE_TYPE == "PS" ]; then echo "PS_FILE_PATH=$REMOTE_FILE_NAME" >> download_payload.env; fi
+        - if [ $REMOTE_FILE_TYPE == "PS" ]; then echo "PS_FILE_NAME=$REMOTE_FILE_NAME" >> download_payload.env; fi                
+        - ls -la        
+    artifacts:
+        paths: 
+            - ./*
+        expire_in: 1 week
+        reports:
+            dotenv: download_payload.env

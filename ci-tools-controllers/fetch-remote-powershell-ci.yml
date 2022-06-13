@@ -1,0 +1,4 @@
+include:
+  - 'ci-builders/download-payload-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_ps-suite.yml'

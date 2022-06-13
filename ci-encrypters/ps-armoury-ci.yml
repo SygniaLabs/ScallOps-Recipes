@@ -1,0 +1,24 @@
+variables:
+  PS_ARMOURED_FILE_NAME: $PS_FILE_NAME-armoured.ps1
+ps_armoury_encrypt:
+  stage: encrypt
+  only:
+    variables:
+     - $CI_ENCRYPTERS =~ /^.*(PSEncrypt).*$/
+  allow_failure: true
+  image: gcr.io/$GCP_PROJECT_ID/psarmoury:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+   - echo $PS_FILE_PATH
+   - ls -la
+   - /opt/microsoft/powershell/7/pwsh -Command "New-PSArmoury -FromFile $PS_FILE_PATH -Verbose -Path $PS_ARMOURED_FILE_NAME"
+   - mkdir -p deploy_dir
+   - cp  $PS_ARMOURED_FILE_NAME deploy_dir/$PS_ARMOURED_FILE_NAME
+   - ls deploy_dir
+  artifacts:
+    paths: 
+      - $PS_ARMOURED_FILE_NAME
+      - deploy_dir
+    expire_in: 1 week

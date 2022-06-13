@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<project baseDir="." outputDir="Confused" xmlns="http://confuser.codeplex.com">
+  <rule preset="none" pattern="true">
+  </rule>
+  <module path="." />
+</project>

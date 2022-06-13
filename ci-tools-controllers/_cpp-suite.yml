@@ -1,0 +1,2 @@
+include:
+  - 'ci-tools-controllers/_pe-suite-ci.yml'

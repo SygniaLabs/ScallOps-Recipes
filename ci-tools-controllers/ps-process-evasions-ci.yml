@@ -1,0 +1,5 @@
+include:
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-evasions/AMSI-bypass-ci.yml'
+  - 'ci-evasions/ps-process-bypasses-ci.yml'
+  - 'ci-loaders/amsibypass-loader-ci.yml'

@@ -1,0 +1,3 @@
+<protection id="resources">
+    <argument name="mode" value="dynamic" />
+</protection>

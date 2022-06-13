@@ -1,0 +1,36 @@
+gcr-read:
+  stage: healthcheck
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+  tags: 
+   - kubernetes
+   - linux
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  only:
+    variables:
+      - $DEPLOYMENT_INIT
+      - $HEALTH_CHECK
+    changes:
+      - _ci-maintain/api-tests.yml
+  script:
+    - echo "[+] PASSED"
+    - echo "[+] Image - gcr.io/$GCP_PROJECT_ID/linuxutils:latest fetched successfully."
+
+
+dockerhub-read:
+  stage: healthcheck
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+  tags: 
+   - kubernetes
+   - linux
+  image: $DOCKERHUB_PRIVATE_CONTAINER_IMAGE
+  only:
+    variables:
+      - $DEPLOYMENT_INIT && $DOCKERHUB_PRIVATE_CONTAINER_IMAGE
+      - $HEALTH_CHECK && $DOCKERHUB_PRIVATE_CONTAINER_IMAGE
+    changes:
+      - _ci-maintain/api-tests.yml
+  script:
+    - echo "[+] PASSED"
+    - echo "[+] Image - $DOCKERHUB_PRIVATE_CONTAINER_IMAGE fetched successfully."

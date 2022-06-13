@@ -1,0 +1,23 @@
+gen_amsibypass_evasion:
+  variables:
+    AMSIBYPASS_PS_PATH: 'ambps.ps1'
+    AMSIBYPASS_PAYLOAD_TYPE: '4 plain' # <0-5> <plain/encoded> # 0-4(various types) / 5(random) plain or encoded PS payload.
+  only:
+    variables:
+     - $CI_EVASIONS =~ /^.*(amsiBypass).*$/
+  stage: evade
+  allow_failure: true
+  image: gcr.io/$GCP_PROJECT_ID/nodejs:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - echo "Using AMSI Bypass payload type - $AMSIBYPASS_PAYLOAD_TYPE"
+    - node ci-evasions/amsi-fail.js $AMSIBYPASS_PAYLOAD_TYPE
+    - mkdir -p deploy_dir
+    - cp $AMSIBYPASS_PS_PATH deploy_dir/$AMSIBYPASS_PS_PATH
+  artifacts:
+    paths: 
+      - $AMSIBYPASS_PS_PATH
+      - deploy_dir
+    expire_in: 1 week

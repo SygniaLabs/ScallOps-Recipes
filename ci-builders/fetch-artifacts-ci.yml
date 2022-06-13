@@ -1,0 +1,26 @@
+fetch_latest_build:
+  stage: build
+  tags: 
+      - kubernetes
+      - linux
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  only:
+    variables:
+      - '$CI_PIPELINE_SOURCE != "push" && $CI_FORCE_REBUILD != "true"'
+  except:
+    variables:
+      - '$CI_PREOBFUSCATIONS =~ /^.*(Namings-GUID-PDB).*$/'
+  script:
+      - echo "Downloading latest successful build_job artifacts..."
+      - 'STATUS_CODE=$(curl -k --location -s -o /dev/null -w "%{http_code}" --header "PRIVATE-TOKEN: $GITLAB_READ_API" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_REF_NAME/download?job=build_job")'
+      - echo $STATUS_CODE
+      - 'if [ $STATUS_CODE -eq 200 ]; then curl -k --location --output latest-build-artifacts.zip --header "PRIVATE-TOKEN: $GITLAB_READ_API" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_REF_NAME/download?job=build_job"; else curl -k --location --output latest-build-artifacts.zip --header "PRIVATE-TOKEN: $GITLAB_READ_API" "$CI_API_V4_URL/projects/$CI_PROJECT_ID/jobs/artifacts/$CI_COMMIT_REF_NAME/download?job=fetch_latest_build"; fi'
+      - ls -la
+      - mkdir -p deploy_dir
+      - unzip latest-build-artifacts.zip #In case we didn't receive any zipped artifacts from previous download, job will fail here.
+      - ls -la
+  artifacts:
+      paths:
+          - $EXE_RELEASE_FOLDER
+          - deploy_dir
+      expire_in: 1 week

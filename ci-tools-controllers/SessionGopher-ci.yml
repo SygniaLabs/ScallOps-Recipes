@@ -1,0 +1,8 @@
+variables:
+  PS_FILE_PATH: 'SessionGopher.ps1'
+  PS_FILE_NAME: 'SessionGopher.ps1'
+  
+
+include:
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_ps-suite.yml'

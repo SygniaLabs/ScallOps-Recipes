@@ -1,0 +1,12 @@
+variables:
+  EXE_RELEASE_FOLDER: 'Source/Akagi/output/x64/Release'
+  EXE_FILE_NAME: 'Akagi64.exe'
+  CI_PROJECT_SLN_PATH: 'Source/uacme.sln'
+
+include:
+  - 'ci-builders/sdk48-vctools19-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'  
+  - 'ci-tools-controllers/_cpp-suite.yml'
+
+
+

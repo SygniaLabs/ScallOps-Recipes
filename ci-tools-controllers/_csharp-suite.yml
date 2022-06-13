@@ -1,0 +1,8 @@
+include:
+  - 'ci-preobfuscate/invisibility-cloak-ci.yml'
+  - 'ci-obfuscations/confuserEX-windows.yml'
+  - 'ci-encrypters/psarmoury-ps-convert-ci.yml'
+  - 'ci-encrypters/dotnet-xor-key.yml'  
+  - 'ci-loaders/dotnet-xorkey-ps-loader.yml'
+  - 'ci-executors/dotnet-invoke-ci.yml'
+  - 'ci-tools-controllers/_pe-suite-ci.yml'

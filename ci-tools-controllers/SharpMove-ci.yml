@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'SharpMove/SharpMove/bin/Release'
+  EXE_FILE_NAME: 'SharpMove.exe'
+  CI_PROJECT_SLN_PATH: 'SharpMove/SharpMove.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

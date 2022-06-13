@@ -1,14 +1,11 @@
 trigger_linux:
   stage: healthcheck
-  rules:
-   - if: '$DEPLOYMENT_INIT'
-     when: always
-   - if: '$CI_MULTI_TRIGGER'
-     when: never
-   - if: '$DOCKERFILE_BUILD_LINUX'
-     when: never
-   - changes:
-       - _ci-maintain/os-triggers.yml
+  only:
+    variables:
+      - $DEPLOYMENT_INIT
+      - $HEALTH_CHECK
+    changes:
+      - _ci-maintain/os-triggers.yml
   tags: 
    - kubernetes
    - linux
@@ -16,27 +13,27 @@ trigger_linux:
   script:
       - 'env'
       - id
+      - 'apt update && apt install -y host'
+      - host $CI_SERVER_HOST
 
 
 trigger_win:
   stage: healthcheck
   variables:
     GIT_SSL_NO_VERIFY: "true"
-  rules:
-   - if: '$DEPLOYMENT_INIT'
-     when: always
-   - if: '$CI_MULTI_TRIGGER'
-     when: never
-   - if: '$DOCKERFILE_BUILD_LINUX'
-     when: never
-   - changes:
-       - _ci-maintain/os-triggers.yml
+  only:
+    variables:
+      - $DEPLOYMENT_INIT
+      - $HEALTH_CHECK
+    changes:
+      - _ci-maintain/os-triggers.yml
   tags: 
    - kubernetes
    - windows
   image: 
-    name: b1t0n/gitlab-runner-helper:x86_64-latest-servercore1809-pwsh
+    name: mcr.microsoft.com/windows/servercore:1809
     entrypoint: [""]
   script:
       - 'ipconfig'
       - 'type C:\Windows\System32\drivers\etc\hosts'
+      - 'nslookup $env:CI_SERVER_HOST'

@@ -1,0 +1,37 @@
+variables:
+  TEST_ON_DOTNET_SDK_VERSION: '3.5' # 6.0 / 4.8 / 3.5
+win10_exec:
+  rules:
+    - if: '$CI_TESTS =~ /^.*(exe_exec).*$/'  
+  stage: test
+  image: mcr.microsoft.com/dotnet/framework/sdk:$TEST_ON_DOTNET_SDK_VERSION
+  tags: 
+   - kubernetes
+   - windows
+  variables:
+    GIT_STRATEGY: none
+  script:
+   - Write-Output "Testing - $EXE_RELEASE_FOLDER/$EXE_FILE_NAME"
+   - Start-Process -FilePath "$EXE_RELEASE_FOLDER/$EXE_FILE_NAME"
+      -ArgumentList "$TEST_COMMAND_ARGS" 
+      -RedirectStandardError proc-errors.txt
+      -RedirectStandardOutput proc-out.txt 
+      -Wait
+   - Get-Content proc-out.txt
+   - Get-Content proc-errors.txt
+  timeout: 15 minutes
+
+win10_invoke_ps:
+  rules:
+    - if: '$CI_TESTS =~ /^.*(ps_invoke).*$/'    
+  stage: test
+  image: mcr.microsoft.com/dotnet/framework/sdk:$TEST_ON_DOTNET_SDK_VERSION
+  tags: 
+   - kubernetes
+   - windows
+  variables:
+    GIT_STRATEGY: none
+  script:
+   - Get-Content $PS_FILE_PATH | Invoke-Expression
+   - $TEST_COMMAND_ARGS
+  timeout: 15 minutes

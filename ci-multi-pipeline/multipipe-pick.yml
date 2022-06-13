@@ -1,0 +1,735 @@
+# Using YAML anchors to update trigger variables in one place. For some reason global variables are not forwarded to downstream pipelines
+
+variables: &global-variables
+    PWNDROP_CURL_CMD: $PWNDROP_CURL_CMD
+    CI_FORCE_REBUILD: $CI_FORCE_REBUILD
+    SHELLCODE_ARGS: $SHELLCODE_ARGS
+    CI_PREOBFUSCATIONS: $CI_PREOBFUSCATIONS
+    CI_OBFUSCATIONS: $CI_OBFUSCATIONS
+    CI_CONVERTERS: $CI_CONVERTERS
+    CI_ENCRYPTERS: $CI_ENCRYPTERS
+    CI_EVASIONS: $CI_EVASIONS
+    CI_LOADERS: $CI_LOADERS
+    CI_TESTS: $CI_TESTS
+    TEST_COMMAND_ARGS: $TEST_COMMAND_ARGS
+    CI_EXECUTORS: $CI_EXECUTORS
+    CI_DEPLOYERS: $CI_DEPLOYERS
+    SHELLCODE_INJECTION_TECHNIQUE: $SHELLCODE_INJECTION_TECHNIQUE
+    DOTNET_INVOKER_CMD: $DOTNET_INVOKER_CMD
+    OBFUSCATED_PROJECT_NAME: $OBFUSCATED_PROJECT_NAME
+    AMSIBYPASS_PAYLOAD_TYPE: $AMSIBYPASS_PAYLOAD_TYPE
+
+
+#Regex matchings structure.
+# (<ToolName/ProjectName>|<Langugage>|<TargetService/TargetTechnique>|<TargetOS>|<m_ad/m_local/m_remote/m_cloud>|m_all)
+#Note: Short words may match with unintended terms, e.g. 'adape' with 'ad', thus require adding prefix/suffix to the match.
+# If term length is 3 characters or less, consider adding 'm_' as a prefix
+
+## Custom pipelines ##
+
+t_fetch-dotNET:
+  stage: multiTrigger
+  rules:
+    - if: '$REMOTE_FILE_URL != "" && $REMOTE_FILE_TYPE == "dotNET"'
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/fetch-external-dotNet-ci.yml
+  variables:
+    REMOTE_FILE_URL: $REMOTE_FILE_URL
+    REMOTE_FILE_TYPE: $REMOTE_FILE_TYPE
+    <<: *global-variables
+
+
+t_fetch-shellcode:
+  stage: multiTrigger
+  rules:
+    - if: '$REMOTE_FILE_URL != "" && $REMOTE_FILE_TYPE == "shellcode"'
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/fetch-remote-shellcode-ci.yml
+  variables:
+    REMOTE_FILE_URL: $REMOTE_FILE_URL
+    REMOTE_FILE_TYPE: $REMOTE_FILE_TYPE    
+    <<: *global-variables
+
+t_fetch-pe:
+  stage: multiTrigger
+  rules:
+    - if: '$REMOTE_FILE_URL != "" && $REMOTE_FILE_TYPE == "PE"'
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/fetch-remote-pe-ci.yml
+  variables:
+    REMOTE_FILE_URL: $REMOTE_FILE_URL
+    REMOTE_FILE_TYPE: $REMOTE_FILE_TYPE    
+    <<: *global-variables
+
+t_fetch-ps:
+  stage: multiTrigger
+  rules:
+    - if: '$REMOTE_FILE_URL != "" && $REMOTE_FILE_TYPE == "PS"'
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/fetch-remote-powershell-ci.yml
+  variables:
+    REMOTE_FILE_URL: $REMOTE_FILE_URL
+    REMOTE_FILE_TYPE: $REMOTE_FILE_TYPE    
+    <<: *global-variables
+
+
+t_ps-evasions:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_EVASIONS =~ /^.*(amsiBypass|psLogging|psReadline|etwBypass).*$/
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/ps-process-evasions-ci.yml
+  variables:
+    <<: *global-variables
+
+
+t_remote-repo-cs:
+  stage: multiTrigger
+  rules:
+    - if: '$REMOTE_REPO_LANG =~ /^(csharp)$/'
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/remote-repo-csharp-ci.yml
+  variables:
+    REMOTE_REPO_URL: $REMOTE_REPO_URL # Input
+    EXE_RELEASE_FOLDER: $EXE_RELEASE_FOLDER # Required
+    EXE_FILE_NAME: $EXE_FILE_NAME # Required
+    CI_PROJECT_SLN_PATH: $CI_PROJECT_SLN_PATH # Required
+    DOTNET_NAMESPACE: $DOTNET_NAMESPACE  # Optional
+    DOTNET_CLASS: $DOTNET_CLASS # Optional
+    DOTNET_ENTRY_METHOD: $DOTNET_ENTRY_METHOD # Optional
+    <<: *global-variables
+
+
+t_remote-repo-cpp:
+  stage: multiTrigger
+  rules:
+    - if: '$REMOTE_REPO_LANG =~ /^(cpp)$/'
+  trigger:
+    strategy: depend
+    include:
+      - local: ci-tools-controllers/remote-repo-cpp-ci.yml
+  variables:
+    REMOTE_REPO_URL: $REMOTE_REPO_URL # Input
+    EXE_RELEASE_FOLDER: $EXE_RELEASE_FOLDER # Required
+    EXE_FILE_NAME: $EXE_FILE_NAME # Required
+    CI_PROJECT_SLN_PATH: $CI_PROJECT_SLN_PATH # Required
+    <<: *global-variables    
+
+
+## Community Tools ## 
+
+t_PowerUpSQL:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(PowerUpSQL|powershell|mssql|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/PowerUpSQL
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_PowerUp:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(PowerUp|powershell|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/PowerUp
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_Rubeus:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Rubeus|csharp|kerberos|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/Rubeus
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_goddi:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(goddi|golang|reconnaissance|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/goddi
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_CVE-2021-1675:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(CVE-2021-1675|SharpPrintNightmare|csharp|printspooler|privilegeescalation|windows|m_local|m_ad|m_all).*$/
+  trigger: 
+    project: community/CVE-2021-1675
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+
+t_CVE-2021-38647:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(CVE-2021-38647|OMIGOD|powershell|rce|azurelinux|m_cloud|m_all).*$/
+  trigger: 
+    project: community/CVE-2021-38647
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_DomainPasswordSpray:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(DomainPasswordSpray|powershell|credentialaccess|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/DomainPasswordSpray
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+
+t_Haim-Windows-Security-Assessment:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Haim-Windows-Security-Assessment|powershell|reconnaissance|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/Haim-Windows-Security-Assessment
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_Inveigh:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Inveigh|powershell|mitm|credentialaccess|windows|m_network|m_all).*$/
+  trigger: 
+    project: community/Inveigh
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_Lockless:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Lockless|csharp|fileaccess|reconnaissance|credentialaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/Lockless
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_Seatbelt:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Seatbelt|csharp|reconnaissance|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/Seatbelt
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpBlock:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpBlock|csharp|evasion|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpBlock
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+
+t_SharpDPAPI:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpDPAPI|csharp|browsers|credentialaccess|windows|m_local|m_remote|m_all).*$/
+  trigger: 
+    project: community/SharpDPAPI
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_SharpEDRChecker:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpEDRChecker|csharp|evasion|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpEDRChecker
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_SharpGPOAbuse:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpGPOAbuse|csharp|adgpo|lateralmovement|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/SharpGPOAbuse
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpHound3:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpHound3|csharp|reconnaissance|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/SharpHound3
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_SharpMapExec:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpMapExec|csharp|smb|winrm|lsass.exe|credentialaccess|lateralmovement|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/SharpMapExec
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_SharpRDP:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(_NOT_SUPPORTED_).*$/ # /^.*(SharpRDP|csharp|rdp|lateralmovement|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/SharpRDP
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_SharpWMI:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpWMI|csharp|wmi|lateralmovement|reconnaissance|windows|m_local|m_remote|m_all).*$/
+  trigger: 
+    project: community/SharpWMI
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_SpoolSample:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SpoolSample|csharp|printspooler|credentialaccess|windows|m_remote|m_all).*$/
+  trigger: 
+    project: community/SpoolSample
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_Tokenvator:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Tokenvator|csharp|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/Tokenvator
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_gowitness:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(gowitness|golang|network|reconnaissance|windows|m_remote|m_all).*$/
+  trigger: 
+    project: community/gowitness
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_pingcastle:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(pingcastle|csharp|reconnaissance|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/pingcastle
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+t_Wsuspcious:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Wsuspcious|csharp|proxy|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/Wsuspcious
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpSocks:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpSocks|powershell|proxyutil|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpSocks
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpCloud:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpCloud|csharp|credentialaccess|windows|m_cloud|m_all).*$/
+  trigger: 
+    project: community/SharpCloud
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_PEASS-ng:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(PEASS-ng|csharp|reconnaissance|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/PEASS-ng
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpClipboard:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpClipboard|csharp|credentialaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpClipboard
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpCrashEventLog:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpCrashEventLog|csharp|eventlog|evasion|windows|m_local|m_remote|m_all).*$/
+  trigger: 
+    project: community/SharpCrashEventLog
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_Sharpmad:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Sharpmad|csharp|adidns|credentialaccess|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/Sharpmad
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpZeroLogon:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpZeroLogon|csharp|CVE-2020-1472|MS-NRPC|zerologon|privilegeescalation|windows|m_ad|m_all).*$/
+  trigger: 
+    project: community/SharpZeroLogon
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SweetPotato:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SweetPotato|csharp|potatoes|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SweetPotato
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_WindowsEnum:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(WindowsEnum|powershell|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/WindowsEnum
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpRDPHijack:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpRDPHijack|csharp|rdp|privilegeescalation|lateralmovement|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpRDPHijack
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+
+t_SessionGopher:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SessionGopher|powershell|smb|credentialaccess|windows|m_local|m_remote|m_all).*$/
+  trigger: 
+    project: community/SessionGopher
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_Watson:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(Watson|csharp|rdp|reconnaissance|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/Watson
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+
+t_SharpFinder:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpFinder|csharp|smb|reconnaissance|credentialaccess|fileaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpFinder
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpWeb:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpWeb|csharp|browsers|credentialaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpWeb
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpUp:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpUp|csharp|privilegeescalation|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpUp
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharPersist:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharPersist|csharp|persistence|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharPersist
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SauronEye:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SauronEye|csharp|smb|reconnaissance|credentialaccess|fileaccess|windows|m_local|m_all).*$/
+  trigger:
+    project: community/SauronEye
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpScribbles:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpScribbles|csharp|stickynotes|reconnaissance|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpScribbles
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpHandler:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpHandler|csharp|lsass.exe|credentialaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpHandler
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpMove:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpMove|csharp|dcom|wmi|scm|scheduledtask|lateralmovement|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpMove
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_SharpStay:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(SharpStay|csharp|persistence|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/SharpStay
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_PPLKiller:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(PPLKiller|m_cpp|protectedprocess|lsass.exe|credentialaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/PPLKiller
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_PPLdump:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(PPLDump|m_cpp|protectedprocess|lsass.exe|credentialaccess|windows|m_local|m_all).*$/
+  trigger: 
+    project: community/PPLdump
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_DInjector:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(DInjector|csharp|injection|evasion|m_all).*$/
+  trigger: 
+    project: community/DInjector
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_Invisi-Shell:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(_NOT_SUPPORTED_).*$/ #/^.*(Invisi-Shell|m_cpp|evasion|windows|m_all).*$/
+  trigger: 
+    project: community/Invisi-Shell
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+
+t_UACME:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(UACME|m_cpp|privilegeescalation|windows|m_all).*$/
+  trigger: 
+    project: community/UACME
+    strategy: depend
+  variables:
+    <<: *global-variables
+
+  
+t_ThreatCheck:
+  stage: multiTrigger
+  only:
+    variables:
+     - $CI_MULTI_TRIGGER =~ /^.*(ThreatCheck).*$/
+  trigger: 
+    project: community/ThreatCheck
+    strategy: depend
+  variables:
+    <<: *global-variables   

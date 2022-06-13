@@ -1,0 +1,7 @@
+    <protection id="ctrl flow">
+      <argument name="type" value="switch" />
+      <argument name="predicate" value="expression" />
+      <argument name="intensity" value="70" />
+      <argument name="depth" value="6" />
+      <argument name="junk" value="true" />
+    </protection>

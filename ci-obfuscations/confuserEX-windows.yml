@@ -1,32 +1,39 @@
 variables:
-  DEPLOY_FILE_PATH: $EXE_FILE_NAME-confused.exe
+  CONFUSED_NAME: $EXE_FILE_NAME-confused.exe
 confuserEX_obfuscate:
   stage: obfuscate
+  only:
+    variables:
+     - $CI_OBFUSCATIONS =~ /^.*(constants|ctrlflow|refproxy|rename|resources|typescramble).*$/
+  allow_failure: true
   variables:
     GIT_SSL_NO_VERIFY: "true" # Running on windows node, and our Gitlab certificate is self-signed.
     GCP_PROJECT_ID: $GCP_PROJECT_ID
   image: 
-    name: gcr.io/$GCP_PROJECT_ID/confuserex-windows:latest
-    entrypoint: ["pwsh.exe"]
+    name: gcr.io/$GCP_PROJECT_ID/confuserex:divided
   tags: 
    - kubernetes
    - windows
   script:
-    # Download previous Jobs artifacts. (Workaround issue: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/4014)
-    - write-output "$env:CI_SERVER_URL/api/v4/projects/$env:CI_PROJECT_ID/pipelines/$env:CI_PIPELINE_ID/jobs"
-    - $env:CI_PROJECT_ID
-    - '$allJobs = (curl.exe --insecure -o - --header "PRIVATE-TOKEN: $env:GITLAB_API_ACCESS" "$env:CI_SERVER_URL/api/v4/projects/$env:CI_PROJECT_ID/pipelines/$env:CI_PIPELINE_ID/jobs" | ConvertFrom-Json)'
-    - 'write-output $allJobs[-1]'
-    - 'curl.exe --insecure --location --output artifacts.zip --header "PRIVATE-TOKEN: $env:GITLAB_API_ACCESS" ("$env:CI_SERVER_URL/api/v4/projects/$env:CI_PROJECT_ID/jobs/" + $allJobs[-1].id + "/artifacts"); Expand-Archive -path artifacts.zip'
-    - 'cd artifacts\$env:EXE_RELEASE_FOLDER'
-    - pwd
-    - dir
+    - dir C:\ConfuserEx\
     - write-output $env:EXE_FILE_NAME
-    - 'import-module C:/ConfuserEx/Create-ConfuserXml.ps1'
-    - Create-ConfuserXml -Binaries $env:EXE_FILE_NAME -Protections "anti debug","constants","resources"
-    - C:\ConfuserEx\ConfuserEx-CLI\Confuser.CLI.exe -n .\Confuser.crproj
+    - $xml = [XML](Get-Content 'C:\ConfuserEx\main.xml')
+    - $xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\watermark.xml')).InnerXml
+    - $CI_OBFUSCATIONS.Contains('constants') -and ($xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\constants.xml')).InnerXml)
+    - $CI_OBFUSCATIONS.Contains('ctrlflow') -and ($xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\ctrlflow.xml')).InnerXml)
+    - $CI_OBFUSCATIONS.Contains('refproxy') -and ($xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\refproxy.xml')).InnerXml)
+    - $CI_OBFUSCATIONS.Contains('rename') -and ($xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\rename.xml')).InnerXml)
+    - $CI_OBFUSCATIONS.Contains('resources') -and ($xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\resources.xml')).InnerXml)
+    - $CI_OBFUSCATIONS.Contains('typescramble') -and ($xml.project.rule.InnerXml += ([XML](Get-Content 'C:\ConfuserEx\typescramble.xml')).InnerXml)
+    - $xml.project.module.path = "deploy_dir\$env:EXE_FILE_NAME"
+    - $xml.save('Confuser.crproj')
     - dir
-    - Copy-Item Confused\$env:EXE_FILE_NAME -Destination .\$env:EXE_FILE_NAME-confused.exe
-    - 'curl.exe -L https://storage.googleapis.com/$CI_CD_UTILS_BUKCET/bins/gitlab-runner-helper.exe --output "gitlab-runner-helper.exe"'
-    - '.\gitlab-runner-helper.exe --version'
-    - '.\gitlab-runner-helper.exe artifacts-uploader --id $env:CI_JOB_ID --token $env:CI_JOB_TOKEN --url $env:CI_SERVER_URL --path .\$env:EXE_FILE_NAME-confused.exe --expire-in "1 week" --verbose'
+    - type C:\ConfuserEx\Confuser.crproj
+    - C:\ConfuserEx\ConfuserEx-CLI\Confuser.CLI.exe -n C:\ConfuserEx\Confuser.crproj
+    - dir C:\ConfuserEx\Confused
+    - Copy-Item Confused\$env:EXE_RELEASE_FOLDER\$env:EXE_FILE_NAME -Destination deploy_dir\$env:CONFUSED_NAME
+  artifacts:
+    paths: 
+      - Confused/$env:EXE_RELEASE_FOLDER/$env:EXE_FILE_NAME
+      - deploy_dir
+    expire_in: 1 week

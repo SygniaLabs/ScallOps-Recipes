@@ -1,0 +1,25 @@
+variables:
+    SHELLCODE_FILE_PATH: $EXE_FILE_NAME-sh.bin
+donut_shellcoder:
+  only:
+    variables:
+     - $CI_CONVERTERS =~ /^.*(PEtoSHELLCODE).*$/
+  stage: convert
+  image: 
+      name: gcr.io/$GCP_PROJECT_ID/donut:latest
+  tags: 
+      - kubernetes
+      - linux
+  script:
+      - ls
+      - echo $SHELLCODE_FILE_PATH
+      - SHELLCODE_ARGS=$(echo $SHELLCODE_ARGS | sed -e 's/\s\+/,/g') # Convert spaces to commas
+      - echo $SHELLCODE_ARGS 
+      - /opt/donut/donut-0.9.2/donut -o $SHELLCODE_FILE_PATH -p "$SHELLCODE_ARGS" -f $EXE_RELEASE_FOLDER/$EXE_FILE_NAME
+      - mkdir -p deploy_dir
+      - cp $SHELLCODE_FILE_PATH deploy_dir/
+  artifacts:
+      paths:
+         - $SHELLCODE_FILE_PATH
+         - deploy_dir
+      expire_in: 1 week

@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'ThreatCheck/ThreatCheck/bin/Release'
+  #EXE_FILE_NAME: 'ThreatCheck.exe'
+  CI_PROJECT_SLN_PATH: 'ThreatCheck/ThreatCheck.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

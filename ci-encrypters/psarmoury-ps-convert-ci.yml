@@ -1,0 +1,24 @@
+variables:
+  CONVERTED_CS_PS_FILE_NAME: $EXE_FILE_NAME-ps-converted-reflection.ps1
+ps_armoury_encrypt:
+  stage: encrypt
+  only:
+    variables:
+     - $CI_ENCRYPTERS =~ /^.*(CStoPSEncrypt).*$/
+  allow_failure: true
+  image: gcr.io/$GCP_PROJECT_ID/psarmoury:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+   - ls -la
+   - /opt/microsoft/powershell/7/pwsh -Command "ConvertTo-Powershell $EXE_RELEASE_FOLDER/$EXE_FILE_NAME"
+   - mkdir -p deploy_dir
+   - mv Invoke-$(basename $EXE_RELEASE_FOLDER/$EXE_FILE_NAME |  cut -d "." -f1).ps1 $CONVERTED_CS_PS_FILE_NAME
+   - cp  $CONVERTED_CS_PS_FILE_NAME deploy_dir/$CONVERTED_CS_PS_FILE_NAME
+   - ls deploy_dir
+  artifacts:
+    paths: 
+      - $CONVERTED_CS_PS_FILE_NAME
+      - deploy_dir
+    expire_in: 1 week

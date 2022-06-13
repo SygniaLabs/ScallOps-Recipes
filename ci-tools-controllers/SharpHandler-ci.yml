@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'Pinvoke-version/bin/Release'
+  EXE_FILE_NAME: 'SharpHandler-Pinvoke.exe'
+  CI_PROJECT_SLN_PATH: 'Pinvoke-version/SharpHandler-Pinvoke.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

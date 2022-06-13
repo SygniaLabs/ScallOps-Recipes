@@ -2,16 +2,25 @@ build_job:
   stage: build
   variables:
     GIT_SSL_NO_VERIFY: "true"
-    MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\msbuild.exe'
+    MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\msbuild.exe'
     GCP_PROJECT_ID: $GCP_PROJECT_ID
-  image: gcr.io/$GCP_PROJECT_ID/ltsc19-sdk35-azbuild:latest
+  image: mcr.microsoft.com/dotnet/framework/sdk:3.5
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_FORCE_REBUILD == "true" || $CI_PREOBFUSCATIONS =~ /^.*(Namings-GUID-PDB).*$/'
   tags: 
    - kubernetes
    - windows
   script:
     - 'nuget restore $env:CI_PROJECT_SLN_PATH'
-    - '& "$env:MSBUILD_PATH" $env:CI_PROJECT_SLN_PATH /p:Configuration=Release'
-    - 'curl.exe -L https://storage.googleapis.com/$CI_CD_UTILS_BUKCET/bins/gitlab-runner-helper.exe --output "gitlab-runner-helper.exe"'
-    - '.\gitlab-runner-helper.exe --version'
-    - '.\gitlab-runner-helper.exe artifacts-uploader --id $env:CI_JOB_ID --token $env:CI_JOB_TOKEN --url $env:CI_SERVER_URL --path $env:EXE_RELEASE_FOLDER\$env:EXE_FILE_NAME --expire-in "1 week" --verbose'
+    - if (-not [string]::IsNullOrEmpty($ADD_NUGET_PACKAGES)) {$ADD_NUGET_PACKAGES_ARR = $ADD_NUGET_PACKAGES.split(","); foreach ($nuget_package in $ADD_NUGET_PACKAGES_ARR) {nuget install $nuget_package.split(":")[0] -Version $nuget_package.split(":")[1] -OutputDirectory packages} }    
+    - '& "$env:MSBUILD_PATH" $env:CI_PROJECT_SLN_PATH /p:Configuration=Release -m'
+    - mkdir -p deploy_dir
+    - Copy-Item -Path $env:EXE_RELEASE_FOLDER/$env:EXE_FILE_NAME -Destination deploy_dir/$env:EXE_FILE_NAME -Recurse -Force
+    - dir deploy_dir
+  artifacts:
+    paths: 
+      - $env:EXE_RELEASE_FOLDER
+      - deploy_dir
+    expire_in: 4 weeks
 
+include: '/ci-builders/fetch-artifacts-ci.yml'

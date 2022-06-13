@@ -1,0 +1,8 @@
+    <protection id="ref proxy">
+      <argument name="mode" value="strong" />
+      <argument name="encoding" value="x86" />
+      <argument name="internal" value="false" />
+      <argument name="typeErasure" value="false" />
+      <argument name="depth" value="4" />
+      <argument name="initCount" value="32" />
+    </protection>

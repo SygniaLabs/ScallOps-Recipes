@@ -4,8 +4,6 @@ variables:
   CI_PROJECT_SLN_PATH: 'PingCastle.sln'
 
 include:
-  - project: 'root/scallops-recipes'
-    file: 'ci-builders/sharptools-ci.yml'
-
-stages:
-  - build
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

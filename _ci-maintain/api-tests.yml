@@ -1,0 +1,45 @@
+community-api-read:
+  stage: healthcheck
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+  tags: 
+   - kubernetes
+   - linux
+  image: curlimages/curl:7.78.0
+  only:
+    variables:
+      - $DEPLOYMENT_INIT
+      - $HEALTH_CHECK
+    changes:
+      - _ci-maintain/api-tests.yml
+  script:
+    - echo "[*] Testing Read API Key..."
+    - echo "[*] Confirming features - 
+      1. Fetch latest successful build. 
+      2. Defender check test requires to fetch binary."
+    - 'STATUS_CODE=$(curl -k --location -s -o /dev/null -w "%{http_code}" --header "PRIVATE-TOKEN: $GITLAB_READ_API" "$CI_API_V4_URL/groups/community/projects")'
+    - echo $STATUS_CODE
+    - 'if [ $STATUS_CODE -eq 200 ]; then echo "[+] Read API key is valid"; else echo "[!] Read API key is invalid" && exit 1;  fi'
+
+
+community-api-write:
+  stage: healthcheck
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+  tags: 
+   - kubernetes
+   - linux
+  image: curlimages/curl:7.78.0
+  only:
+    variables:
+      - $DEPLOYMENT_INIT
+      - $HEALTH_CHECK
+    changes:
+      - _ci-maintain/api-tests.yml
+  script:
+    - echo "[*] Testing Write API Key..."
+    - echo "[*] Confirming features - 
+      1. Import community tools. 
+    - 'STATUS_CODE=$(curl -k --location -s -o /dev/null -w "%{http_code}" --header "PRIVATE-TOKEN: $GITLAB_API_ACCESS" "$CI_API_V4_URL/groups/community/projects")'
+    - echo $STATUS_CODE
+    - 'if [ $STATUS_CODE -eq 200 ]; then echo "[+] Write API key is valid"; else echo "[!] Write API key is invalid" && exit 1;  fi'

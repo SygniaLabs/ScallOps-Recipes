@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'Sharpmad/bin/Release'
+  EXE_FILE_NAME: 'Sharpmad.exe'
+  CI_PROJECT_SLN_PATH: 'Sharpmad.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

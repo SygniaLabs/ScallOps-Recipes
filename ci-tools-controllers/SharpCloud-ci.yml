@@ -1,0 +1,10 @@
+variables:
+  EXE_RELEASE_FOLDER: 'SharpCloud/bin/Release'
+  EXE_FILE_NAME: 'SharpCloud.exe'
+  CI_PROJECT_SLN_PATH: 'SharpCloud.sln'
+  DEPLOY_FILE_PATH: $EXE_RELEASE_FOLDER/$EXE_FILE_NAME
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

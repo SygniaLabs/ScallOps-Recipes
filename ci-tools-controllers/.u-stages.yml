@@ -1,0 +1,16 @@
+stages:
+  - pull
+  - debloat
+  - preobfuscate
+  - build
+  - convert
+  - obfuscate
+  - encrypt
+  - evade
+  - load
+  - exec
+  - deployfilter
+  - test
+  - avtest
+  - deploy
+  - notify

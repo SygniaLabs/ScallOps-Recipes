@@ -1,0 +1,8 @@
+    <protection id="constants">
+      <argument name="mode" value="x86" />
+      <argument name="decoderCount" value="10" />
+      <argument name="elements" value="SNI" />
+      <argument name="cfg" value="true" />
+      <argument name="compressor" value="Lz4" />
+      <argument name="compress" value="Force" />
+    </protection>

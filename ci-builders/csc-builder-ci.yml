@@ -1,0 +1,31 @@
+build_job: # csc_build
+  stage: build
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+    CSC_PATH: 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+#   CSC_PATH: 'C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe'
+#   CSC_PATH: 'C:\Windows\Microsoft.NET\Framework64\v3.5\csc.exe'
+#   CSC_PATH: 'C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe'
+#   CSC_PATH: 'C:\Windows\Microsoft.NET\Framework64\v2.0.50727\csc.exe'
+#   CSC_PATH: 'C:\Windows\Microsoft.NET\Framework\v2.0.50727\csc.exe'
+    GCP_PROJECT_ID: $GCP_PROJECT_ID
+  image: mcr.microsoft.com/dotnet/framework/sdk:3.5
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_FORCE_REBUILD == "true"'
+  tags: 
+   - kubernetes
+   - windows
+  script:
+    - '& "$env:CSC_PATH" -out:"$env:EXE_FILE_NAME" "$env:CS_SOURCE_FILE_NAME"'
+    - dir
+    - New-Item -ItemType Directory -Force -Path deploy_dir
+    - Copy-Item -Path $env:EXE_FILE_NAME -Destination deploy_dir/$env:EXE_FILE_NAME -Recurse -Force 
+    - dir deploy_dir
+  artifacts:
+    paths: 
+      - $env:EXE_RELEASE_FOLDER\$env:EXE_FILE_NAME
+      - deploy_dir
+    expire_in: 1 week
+
+
+include: '/ci-builders/fetch-artifacts-ci.yml'

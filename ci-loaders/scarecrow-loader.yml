@@ -1,0 +1,28 @@
+variables:
+    # SHELLCODE_FILE_PATH: $EXE_FILE_NAME
+    SCARECROW_OUTPUT_FORMAT: dll
+    PACKED_FILE_NAME: $SHELLCODE_FILE_PATH.$SCARECROW_OUTPUT_FORMAT
+scarecrow_loader:
+    stage: load
+    only:
+      variables:
+         - $CI_LOADERS =~ /^.*(shellcode-dll).*$/
+    image: 
+        name: gcr.io/$GCP_PROJECT_ID/scarecrow:latest
+    tags: 
+        - kubernetes
+        - linux
+    script:
+        - echo $SHELLCODE_FILE_PATH
+        - mkdir -p deploy_dir
+        # ScareCrow randomaizes the name without user control...
+        - mkdir scarecrow-tmp; cd scarecrow-tmp
+        - /opt/ScareCrow/ScareCrow -Loader $SCARECROW_OUTPUT_FORMAT -domain google.com -etw -I ../$SHELLCODE_FILE_PATH
+        - mv `ls` ../$PACKED_FILE_NAME
+        - cd ..
+        - cp $PACKED_FILE_NAME deploy_dir/
+    artifacts:
+        paths:
+           - $PACKED_FILE_NAME 
+           - deploy_dir
+        expire_in: 1 week

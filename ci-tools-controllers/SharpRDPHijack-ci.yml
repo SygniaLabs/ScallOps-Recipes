@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: '.'
+  EXE_FILE_NAME: 'SharpRDPHijack.exe'
+  CS_SOURCE_FILE_NAME: 'SharpRDPHijack.cs'
+
+include:
+  - 'ci-builders/csc-builder-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

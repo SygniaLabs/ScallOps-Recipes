@@ -1,0 +1,24 @@
+invisicloak:
+  stage: preobfuscate
+  only:
+    variables:
+     - $CI_PREOBFUSCATIONS =~ /^.*(Namings-GUID-PDB).*$/
+  image: gcr.io/$GCP_PROJECT_ID/invisibilitycloak:latest
+  variables:
+    OBFUSCATED_PROJECT_NAME: 'Hagrid'
+    INVISICLOAK_OBFUSCATION_METHOD: 'rot13'
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - echo "New project name - $OBFUSCATED_PROJECT_NAME"
+    - InvisibilityCloakResult=$(python3 /opt/InvisibilityCloak/InvisibilityCloak.py -d $(dirname $CI_PROJECT_SLN_PATH) -n $OBFUSCATED_PROJECT_NAME -m $INVISICLOAK_OBFUSCATION_METHOD 2>&1)
+    - '[[ $InvisibilityCloakResult == *ERROR:* ]] && echo "[-] InvisibilityCloak returned error: $InvisibilityCloakResult" && exit 1;'
+    - /opt/InvisibilityCloak/invisicloak-overwrite-envs.sh
+    - ls -la
+  artifacts:
+    paths: 
+      - ./*
+    expire_in: 1 week
+    reports:
+        dotenv: invisicloak.env

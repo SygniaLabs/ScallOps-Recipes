@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'StickyNotesExtract/StickyNotesExtract/bin/Release'
+  EXE_FILE_NAME: 'StickyNotesExtract.exe'
+  CI_PROJECT_SLN_PATH: 'StickyNotesExtract/StickyNotesExtract.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

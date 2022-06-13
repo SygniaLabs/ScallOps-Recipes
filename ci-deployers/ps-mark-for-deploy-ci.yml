@@ -1,0 +1,20 @@
+ps_mark_orig_ps1:
+  stage: deployfilter
+  image: ubuntu:18.04
+  only:
+    variables:
+      - $CI_DEPLOYERS
+  tags: 
+   - kubernetes
+   - linux
+  script:
+   - echo $PS_FILE_PATH
+   - echo $PS_FILE_NAME
+   - ls -la
+   - mkdir -p deploy_dir
+   - cp $PS_FILE_PATH deploy_dir/$PS_FILE_NAME
+   - ls deploy_dir
+  artifacts:
+    paths:
+      - deploy_dir/$PS_FILE_NAME
+    expire_in: 1 week

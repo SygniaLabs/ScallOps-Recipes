@@ -1,0 +1,19 @@
+defender_check:
+  stage: avtest
+  variables:
+    THREATCHECK_PROJECT_PATH: 'community%2fThreatCheck'
+  tags: 
+    - models
+    - tests
+  only:
+    variables:
+     - $CI_TESTS =~ /^.*(defendercheck).*$/
+  script:
+      - $THREATCHECK_BINS_LINK = "$CI_EXTERNAL_URL/api/v4/projects/$THREATCHECK_PROJECT_PATH/jobs/artifacts/master/download?job=build_job&private_token=$GITLAB_READ_API"
+      - echo $THREATCHECK_BINS_LINK
+      - '[System.Net.ServicePointManager]::ServerCertificateValidationCallback = { $true }'
+      - (New-Object System.Net.WebClient).DownloadFile($THREATCHECK_BINS_LINK, "$pwd\threatcheck_artifacts.zip")
+      - Expand-Archive 'threatcheck_artifacts.zip' -DestinationPath './'
+      - dir
+      - $REMOTE_FILE_NAME -ne $null -and (ThreatCheck\ThreatCheck\bin\Release\ThreatCheck.exe -e Defender -f $REMOTE_FILE_NAME)
+      - (Test-Path -Path deploy_dir) -and (ThreatCheck\ThreatCheck\bin\Release\ThreatCheck.exe -e Defender -f "deploy_dir\$EXE_FILE_NAME")

@@ -1,0 +1,5 @@
+include:
+  - 'ci-converters/donut-ci.yml'
+  - 'ci-encrypters/dinjector-encrypt-ci.yml'
+  - 'ci-loaders/scarecrow-loader.yml'
+  - 'ci-executors/dinjector-injections-ci.yml'

@@ -1,0 +1,3 @@
+include:
+  - 'ci-builders/go-builder-win-ci.yml'
+  - 'ci-tools-controllers/_pe-suite-ci.yml'

@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'bin'
+  EXE_FILE_NAME: 'pplkiller.sys'
+  CI_PROJECT_SLN_PATH: 'PPLKiller.sln'
+
+include:
+  - 'ci-builders/sdk48-vctools19-wdk2004-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_cpp-suite.yml'

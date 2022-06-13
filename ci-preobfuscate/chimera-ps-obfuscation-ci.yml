@@ -1,0 +1,38 @@
+variables:
+  PS_OBFUSCATED_FILE_NAME: $PS_FILE_NAME-chimered.ps1
+ps_chimera_obfuscation:
+  stage: preobfuscate
+  only:
+    variables:
+     - $CI_PREOBFUSCATIONS =~ /^.*(psCommnets|psVariables|psBackticks).*$/
+  allow_failure: true
+  image: gcr.io/$GCP_PROJECT_ID/chimera:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+   - echo $PS_FILE_PATH
+   - CHIMERA_CMD_BUILDER="/opt/chimera/chimera.sh -f $PS_FILE_PATH -o $PS_OBFUSCATED_FILE_NAME"
+   - '[[ "$CI_PREOBFUSCATIONS" == *psCommnets* ]] && CHIMERA_CMD_BUILDER+=" --comments /opt/chimera/chimera-comments.txt"'
+   - '[[ "$CI_PREOBFUSCATIONS" == *psVariables* ]] && CHIMERA_CMD_BUILDER+=" --variables /opt/chimera/1981words.txt"'
+   - '[[ "$CI_PREOBFUSCATIONS" == *psBackticks* ]] && CHIMERA_CMD_BUILDER+=" --keywords --backticks new-object,invoke-expression,out-file"'
+   - CHIMERA_CMD_BUILDER+=" -l 2 --examine --no-art --quiet"
+   - echo "Final command is - ${CHIMERA_CMD_BUILDER}"
+   - $CHIMERA_CMD_BUILDER
+   - mkdir -p deploy_dir
+   - cp  $PS_OBFUSCATED_FILE_NAME deploy_dir/$PS_OBFUSCATED_FILE_NAME
+   - ls deploy_dir
+  artifacts:
+    paths: 
+      - $PS_OBFUSCATED_FILE_NAME
+      - deploy_dir
+    expire_in: 1 week
+
+#Note: using '-c' flag which remove comments with arbitrary ones, may overwrite links containning #, which in turn may malfunction the entire script from being load.
+  # - To over come that we added a file that it take the comments to exchange with, and added the quote " suffix.
+#Note: using '-k' flag may break strings appearing in a write file or output sentence
+#Note: using '-v' flag may break aliases/cmdlets within scripts. For example: Test-Path --> Test-SDWerg5vsdf34sads.
+  # - To overcome that we added additional variable names to the ignore list:
+    # ignore='\$_\|$File\|$Name\|$Path\|$env\|$true\|$false\|$read\|$verb\|$error\|$null\|$arg\|>\|&\|+\|@\|\/\|-\|\$$';
+    # We also added a wordlist containning legitimate words instead of generated strings.
+#Refer to guide for more info: https://github.com/tokyoneon/Chimera/blob/master/USAGE.md

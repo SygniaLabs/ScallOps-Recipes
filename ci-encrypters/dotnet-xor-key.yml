@@ -1,0 +1,25 @@
+variables:
+  CI_DOTNETXOR_OUTPUT_NAME: $EXE_FILE_NAME-XORED.b64
+b64_encode_xor_encrypt:
+  stage: encrypt
+  only:
+    variables:
+     - $CI_ENCRYPTERS =~ /^.*(b64Xor).*$/
+  allow_failure: true  
+  image: gcr.io/$GCP_PROJECT_ID/dotnet-xor:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - ls -la
+    - mkdir -p deploy_dir
+    - XOR_KEY_VALUE_HEX=0x$(xxd -l 1 -c 32 -p < /dev/random)
+    - echo $XOR_KEY_VALUE_HEX
+    - echo $XOR_KEY_VALUE_HEX >> deploy_dir/$EXE_FILE_NAME-xor.key
+    - /opt/microsoft/powershell/7/pwsh -Command "Invoke-Xor -Key $XOR_KEY_VALUE_HEX -Binary $EXE_RELEASE_FOLDER/$EXE_FILE_NAME -OutFile $CI_DOTNETXOR_OUTPUT_NAME -Verbose"
+    - cp $CI_DOTNETXOR_OUTPUT_NAME deploy_dir/$CI_DOTNETXOR_OUTPUT_NAME
+  artifacts:
+    paths: 
+      - $CI_DOTNETXOR_OUTPUT_NAME
+      - deploy_dir
+    expire_in: 1 week

@@ -1,0 +1,7 @@
+variables:
+  PS_FILE_PATH: 'SharpSocks.ps1'
+  PS_FILE_NAME: 'SharpSocks.ps1'
+
+include:
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_ps-suite.yml'

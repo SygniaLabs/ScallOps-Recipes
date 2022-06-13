@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'SharpStay/SharpStay/bin/Release'
+  EXE_FILE_NAME: 'SharpStay.exe'
+  CI_PROJECT_SLN_PATH: 'SharpStay/SharpStay.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

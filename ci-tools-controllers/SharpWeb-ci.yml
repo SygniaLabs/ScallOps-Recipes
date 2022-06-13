@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'bin/Release'
+  EXE_FILE_NAME: 'SharpWeb.exe'
+  CI_PROJECT_SLN_PATH: 'SharpWeb.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

@@ -1,90 +1,324 @@
 {
     "revisoin": "v0.1",
-    "public": [
+    "community": [
         {
             "name": "Rubeus",
             "import_url":"https://github.com/GhostPack/Rubeus.git", 
-            "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/Rubeus-ci.yml@root/scallops-recipes"
+            "visibility":"internal",
+            "ci_config_path": "ci-tools-controllers/Rubeus-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "SharpHound3",
             "import_url":"https://github.com/BloodHoundAD/SharpHound3.git", 
-            "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/SharpHound3-ci.yml@root/scallops-recipes"
+            "visibility":"internal",
+
+            "ci_config_path": "ci-tools-controllers/SharpHound3-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "Seatbelt",
             "import_url":"https://github.com/GhostPack/Seatbelt.git", 
-            "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/Seatbelt-ci.yml@root/scallops-recipes"
+            "visibility":"internal",
+            "ci_config_path": "ci-tools-controllers/Seatbelt-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "SharpDPAPI",
             "import_url":"https://github.com/GhostPack/SharpDPAPI.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/SharpDPAPI-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/SharpDPAPI-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "SharpWMI",
             "import_url":"https://github.com/GhostPack/SharpWMI.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/SharpWMI-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/SharpWMI-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "PowerUp",
             "import_url":"https://github.com/HarmJ0y/PowerUp.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/PowerUp-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/PowerUp-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "Inveigh",
             "import_url":"https://github.com/Kevin-Robertson/Inveigh.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/Inveigh-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/Inveigh-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "pingcastle",
             "import_url":"https://github.com/vletoux/pingcastle.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/pingcastle-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/pingcastle-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "DomainPasswordSpray",
             "import_url":"https://github.com/dafthack/DomainPasswordSpray.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/DomainPasswordSpray-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/DomainPasswordSpray-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "PrintNightmare",
             "import_url":"https://github.com/cube0x0/CVE-2021-1675.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/PrintNightmare-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/PrintNightmare-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "PowerUpSQL",
             "import_url":"https://github.com/NetSPI/PowerUpSQL.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/PowerUpSQL-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/PowerUpSQL-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "goddi",
             "import_url":"https://github.com/NetSPI/goddi.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/goddi-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/goddi-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "gowitness",
             "import_url":"https://github.com/sensepost/gowitness.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/gowitness-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/gowitness-ci.yml@ci/scallops-recipes"
         },
         {
             "name": "SharpEDRChecker",
             "import_url":"https://github.com/PwnDexter/SharpEDRChecker.git", 
             "visibility":"internal", 
-            "ci_config_path": "ci-tools-controllers/SharpEDRChecker-ci.yml@root/scallops-recipes"
+            "ci_config_path": "ci-tools-controllers/SharpEDRChecker-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpSocks",
+            "import_url":"https://github.com/nettitude/SharpSocks.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpSocks-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "CVE-2021-1675",
+            "import_url":"https://github.com/cube0x0/CVE-2021-1675.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/CVE-2021-1675-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SeriousSam",
+            "import_url":"https://github.com/cube0x0/CVE-2021-36934.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SeriousSam-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Haim-Windows-Security-Assessment",
+            "import_url":"https://github.com/haim-n/Windows-Security-Assessment.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Haim-Windows-Security-Assessment-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Lockless",
+            "import_url":"https://github.com/GhostPack/Lockless.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Lockless-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "PPLDump",
+            "import_url":"https://github.com/itm4n/PPLdump.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/PPLDump-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpGPOAbuse",
+            "import_url":"https://github.com/FSecureLABS/SharpGPOAbuse.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpGPOAbuse-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpMapExec",
+            "import_url":"https://github.com/cube0x0/SharpMapExec.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpMapExec-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpRDP",
+            "import_url":"https://github.com/0xthirteen/SharpRDP.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpRDP-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SpoolSample",
+            "import_url":"https://github.com/leechristensen/SpoolSample.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SpoolSample-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Tokenvator",
+            "import_url":"https://github.com/0xbadjuju/Tokenvator.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Tokenvator-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Wsuspcious",
+            "import_url":"https://github.com/GoSecure/WSuspicious.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Wsuspcious-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "CVE-2021-38647",
+            "import_url":"https://github.com/AlteredSecurity/CVE-2021-38647.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/CVE-2021-38647-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpCloud",
+            "import_url":"https://github.com/chrismaddalena/SharpCloud.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpCloud-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpBlock",
+            "import_url":"https://github.com/CCob/SharpBlock.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpBlock-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "WindowsEnum",
+            "import_url":"https://github.com/absolomb/WindowsEnum.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/WindowsEnum-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpCrashEventLog",
+            "import_url":"https://github.com/slyd0g/SharpCrashEventLog.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpCrashEventLog-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpZeroLogon",
+            "import_url":"https://github.com/nccgroup/nccfsas.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpZeroLogon-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpClipboard",
+            "import_url":"https://github.com/slyd0g/SharpClipboard.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpClipboard-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Sharpmad",
+            "import_url":"https://github.com/Kevin-Robertson/Sharpmad.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Sharpmad-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SweetPotato",
+            "import_url":"https://github.com/CCob/SweetPotato.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SweetPotato-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "PEASS-ng",
+            "import_url":"https://github.com/carlospolop/PEASS-ng.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/PEASS-ng-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpRDPHijack",
+            "import_url":"https://github.com/bohops/SharpRDPHijack.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpRDPHijack-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "PPLKiller",
+            "import_url":"https://github.com/Mattiwatti/PPLKiller.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/PPLKiller-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpStay",
+            "import_url":"https://github.com/0xthirteen/SharpStay.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpStay-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpMove",
+            "import_url":"https://github.com/0xthirteen/SharpMove.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpMove-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpHandler",
+            "import_url":"https://github.com/jfmaes/SharpHandler.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpHandler-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpScribbles",
+            "import_url":"https://github.com/V1V1/SharpScribbles.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpScribbles-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SauronEye",
+            "import_url":"https://github.com/vivami/SauronEye.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SauronEye-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharPersist",
+            "import_url":"https://github.com/mandiant/SharPersist.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharPersist-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpUp",
+            "import_url":"https://github.com/GhostPack/SharpUp.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpUp-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpWeb",
+            "import_url":"https://github.com/djhohnstein/SharpWeb.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpWeb-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SharpFinder",
+            "import_url":"https://github.com/s0lst1c3/SharpFinder.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SharpFinder-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Watson",
+            "import_url":"https://github.com/rasta-mouse/Watson.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Watson-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "SessionGopher",
+            "import_url":"https://github.com/Arvanaghi/SessionGopher.git", 
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/SessionGopher-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "DInjector",
+            "import_url":"https://github.com/snovvcrash/DInjector.git",
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/DInjector-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "UACME",
+            "import_url":"https://github.com/hfiref0x/UACME.git",
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/UACME-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "Invisi-Shell",
+            "import_url":"https://github.com/OmerYa/Invisi-Shell.git",
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/Invisi-Shell-ci.yml@ci/scallops-recipes"
+        },
+        {
+            "name": "ThreatCheck",
+            "import_url":"https://github.com/rasta-mouse/ThreatCheck.git",
+            "visibility":"internal", 
+            "ci_config_path": "ci-tools-controllers/ThreatCheck-ci.yml@ci/scallops-recipes"
         }
-
     ]
 }

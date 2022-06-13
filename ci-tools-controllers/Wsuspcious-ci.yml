@@ -1,0 +1,9 @@
+variables:
+  EXE_RELEASE_FOLDER: 'WSuspicious\bin\Release\net45'
+  EXE_FILE_NAME: 'WSuspicious.exe'
+  CI_PROJECT_SLN_PATH: 'WSuspicious.sln'
+
+include:
+  - 'ci-builders/sharptools-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'
+  - 'ci-tools-controllers/_csharp-suite.yml'

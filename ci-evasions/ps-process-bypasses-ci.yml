@@ -1,0 +1,21 @@
+variables:
+  PS_READLINE_DISABLE_PATH: 'ps-readline-history-saveNothing.ps1'
+disable_psreadline:
+  only:
+    variables:
+     - $CI_EVASIONS =~ /^.*(psReadline).*$/
+  stage: evade
+  allow_failure: true
+  image: gcr.io/$GCP_PROJECT_ID/linuxutils:latest
+  tags: 
+   - kubernetes
+   - linux
+  script:
+    - echo 'Set-PSReadLineOption -HistorySaveStyle SaveNothing' >> $PS_READLINE_DISABLE_PATH
+    - mkdir -p deploy_dir
+    - cp $PS_READLINE_DISABLE_PATH deploy_dir/$PS_READLINE_DISABLE_PATH
+  artifacts:
+    paths: 
+      - $PS_READLINE_DISABLE_PATH
+      - deploy_dir
+    expire_in: 1 week

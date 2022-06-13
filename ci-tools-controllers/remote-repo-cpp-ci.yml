@@ -1,0 +1,7 @@
+include:
+  - 'ci-pullers/pull-remote-repo-ci.yml'
+  - 'ci-builders/sdk48-vctools19-ci.yml'
+  - 'ci-tools-controllers/_main-suite.yml'  
+  - 'ci-tools-controllers/_cpp-suite.yml'
+
+

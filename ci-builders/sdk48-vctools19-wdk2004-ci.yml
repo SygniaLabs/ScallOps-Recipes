@@ -1,0 +1,28 @@
+build_job: # vctools19_wdk2004_build
+  stage: build
+  image: gcr.io/$GCP_PROJECT_ID/winsrv-netsdk48-vctools17-19-wdk2004:latest
+  variables:
+    GIT_SSL_NO_VERIFY: "true"
+    GCP_PROJECT_ID: $GCP_PROJECT_ID
+    MSBUILD_PATH: 'C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\Bin\MSBuild.exe'
+    MSBUILD_PLATFORM_TYPE: "x64"
+  tags: 
+   - kubernetes
+   - windows
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_FORCE_REBUILD == "true"'
+  script:
+    - dir
+    - 'nuget restore $env:CI_PROJECT_SLN_PATH'
+    - '& "$env:MSBUILD_PATH" $env:CI_PROJECT_SLN_PATH /p:Configuration=Release -m /p:Platform=$env:MSBUILD_PLATFORM_TYPE'
+    - mkdir deploy_dir
+    - Copy-Item -Path $env:EXE_RELEASE_FOLDER/$env:EXE_FILE_NAME -Destination deploy_dir/$env:EXE_FILE_NAME -Recurse -Force 
+    - dir deploy_dir
+  artifacts:
+    paths: 
+      - $env:EXE_RELEASE_FOLDER
+      - deploy_dir
+    expire_in: 1 week
+
+
+include: '/ci-builders/fetch-artifacts-ci.yml'
